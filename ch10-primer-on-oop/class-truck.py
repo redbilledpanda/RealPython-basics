@@ -1,6 +1,7 @@
 # this little code snippet demonstrate
 import datetime
 import pdb
+import re
 
 class vehicle:
 
@@ -12,7 +13,7 @@ class vehicle:
         self.registration = registration
 
     def __repr__(self):
-        return f"Car registered as \"{self.registration}\" is a {self.make} {self.model}"
+        return f"Vehicle registered as \"{self.registration}\" is a {self.make} {self.model}"
 
     def SetSellingPrice(self):
         self.SellingPrice = int(input("What is your selling price?: "))
@@ -79,13 +80,14 @@ def CheckFairPrice(vehicle):
 class truck(vehicle):
     # __repr__ derives from __str__ hence it must *return* a string, NOT print it
     def __repr__(self):
+        basicDetails = super().__repr__()
         newline = '\n'
         (NumCyl, HP, Torque) = self.GetEngineDetails()
         if (NumCyl > 0):
             EngineDetails = f"It has a {NumCyl} cylinder engine with {HP}hp and torque value of {Torque}lb-ft"
         else:
             EngineDetails = ""
-        return (f"Truck registered as \"{self.registration}\" is a {self.make} {self.model}{newline}" + EngineDetails)
+        return (basicDetails + newline + EngineDetails)
 
     def SetEngineDetails(self):
         self.NumCylinders = int(input("How many cylinders does this truck have?: "))
@@ -106,10 +108,15 @@ class truck(vehicle):
         except AttributeError:
             return (0,0,0)
 
-print("\n\n/************************************************/")
-Truck2 = truck("Dodge", "RAM", "California 921606")
+# user input is ALWAYS a string, need to convert it to a tuple
+userinput = re.split("[, ]+", input("What is your vehicle make and model? (make,model): "))
+(make, model) = tuple(userinput)
+userinput = re.split("[, ]+", input("Plate details (State,registration): "))
+(state, registration) = tuple(userinput)
 
-print(Truck2)
+Truck2 = truck(make, model, (state + ' ' + registration))
+
+#print(Truck2)
 
 Truck2.SetSellingPrice()
 Truck2.SetMileage()
@@ -117,6 +124,7 @@ Truck2.SetRegistrationYear()
 
 Truck2.SetEngineDetails()
 Truck2.SetTypicalUsage()
+print("\n\n/************************************************/")
 print(Truck2)
 
 CheckFairPrice(Truck2)
